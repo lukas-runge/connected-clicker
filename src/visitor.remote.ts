@@ -1,5 +1,5 @@
 import { command, query } from '$app/server';
-import { db } from '../prisma/db';
+import { connectDb, db } from '../prisma/db';
 import { applyVisitorDelta, createVisitorStats } from '$lib/visitor-count';
 
 async function getOrCreateDefaultDevice() {
@@ -16,6 +16,8 @@ async function getOrCreateDefaultDevice() {
 }
 
 async function readVisitorStats() {
+  await connectDb();
+
   const result = await db.orm.VisitorEvent.aggregate((event) => ({
     totalDelta: event.sum('count'),
     totalEvents: event.count()
