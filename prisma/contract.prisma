@@ -1,0 +1,20 @@
+// use prisma-next
+
+model ClickerDevice {
+  id        String         @id @default(uuid())
+  name      String
+  location  String?
+  events    VisitorEvent[]
+  createdAt DateTime       @default(now())
+  updatedAt temporal.updatedAt()
+}
+
+model VisitorEvent {
+  id         String        @id @default(uuid())
+  device     ClickerDevice @relation(fields: [deviceId], references: [id])
+  deviceId   String
+  direction  String
+  count      Int           @default(1)
+  occurredAt DateTime      @default(now())
+  createdAt  DateTime      @default(now())
+}

@@ -1,0 +1,367 @@
+{
+  "schemaVersion": "1",
+  "targetFamily": "sql",
+  "target": "postgres",
+  "profileHash": "sha256:1a8dbe044289f30a1de958fe800cc5a8378b285d2e126a8c44b58864bac2c18e",
+  "roots": {
+    "clickerDevice": "ClickerDevice",
+    "visitorEvent": "VisitorEvent"
+  },
+  "models": {
+    "ClickerDevice": {
+      "fields": {
+        "createdAt": {
+          "nullable": false,
+          "type": {
+            "codecId": "pg/timestamptz@1",
+            "kind": "scalar"
+          }
+        },
+        "id": {
+          "nullable": false,
+          "type": {
+            "codecId": "sql/char@1",
+            "kind": "scalar",
+            "typeParams": {
+              "length": 36
+            }
+          }
+        },
+        "location": {
+          "nullable": true,
+          "type": {
+            "codecId": "pg/text@1",
+            "kind": "scalar"
+          }
+        },
+        "name": {
+          "nullable": false,
+          "type": {
+            "codecId": "pg/text@1",
+            "kind": "scalar"
+          }
+        },
+        "updatedAt": {
+          "nullable": false,
+          "type": {
+            "codecId": "pg/timestamptz@1",
+            "kind": "scalar"
+          }
+        }
+      },
+      "relations": {
+        "events": {
+          "cardinality": "1:N",
+          "on": {
+            "localFields": [
+              "id"
+            ],
+            "targetFields": [
+              "deviceId"
+            ]
+          },
+          "to": "VisitorEvent"
+        }
+      },
+      "storage": {
+        "fields": {
+          "createdAt": {
+            "column": "createdAt"
+          },
+          "id": {
+            "column": "id"
+          },
+          "location": {
+            "column": "location"
+          },
+          "name": {
+            "column": "name"
+          },
+          "updatedAt": {
+            "column": "updatedAt"
+          }
+        },
+        "table": "clickerDevice"
+      }
+    },
+    "VisitorEvent": {
+      "fields": {
+        "count": {
+          "nullable": false,
+          "type": {
+            "codecId": "pg/int4@1",
+            "kind": "scalar"
+          }
+        },
+        "createdAt": {
+          "nullable": false,
+          "type": {
+            "codecId": "pg/timestamptz@1",
+            "kind": "scalar"
+          }
+        },
+        "deviceId": {
+          "nullable": false,
+          "type": {
+            "codecId": "pg/text@1",
+            "kind": "scalar"
+          }
+        },
+        "direction": {
+          "nullable": false,
+          "type": {
+            "codecId": "pg/text@1",
+            "kind": "scalar"
+          }
+        },
+        "id": {
+          "nullable": false,
+          "type": {
+            "codecId": "sql/char@1",
+            "kind": "scalar",
+            "typeParams": {
+              "length": 36
+            }
+          }
+        },
+        "occurredAt": {
+          "nullable": false,
+          "type": {
+            "codecId": "pg/timestamptz@1",
+            "kind": "scalar"
+          }
+        }
+      },
+      "relations": {
+        "device": {
+          "cardinality": "N:1",
+          "on": {
+            "localFields": [
+              "deviceId"
+            ],
+            "targetFields": [
+              "id"
+            ]
+          },
+          "to": "ClickerDevice"
+        }
+      },
+      "storage": {
+        "fields": {
+          "count": {
+            "column": "count"
+          },
+          "createdAt": {
+            "column": "createdAt"
+          },
+          "deviceId": {
+            "column": "deviceId"
+          },
+          "direction": {
+            "column": "direction"
+          },
+          "id": {
+            "column": "id"
+          },
+          "occurredAt": {
+            "column": "occurredAt"
+          }
+        },
+        "table": "visitorEvent"
+      }
+    }
+  },
+  "storage": {
+    "namespaces": {
+      "__unbound__": {
+        "id": "__unbound__",
+        "kind": "postgres-unbound-schema",
+        "tables": {
+          "clickerDevice": {
+            "columns": {
+              "createdAt": {
+                "codecId": "pg/timestamptz@1",
+                "default": {
+                  "expression": "now()",
+                  "kind": "function"
+                },
+                "nativeType": "timestamptz",
+                "nullable": false
+              },
+              "id": {
+                "codecId": "sql/char@1",
+                "nativeType": "character",
+                "nullable": false,
+                "typeParams": {
+                  "length": 36
+                }
+              },
+              "location": {
+                "codecId": "pg/text@1",
+                "nativeType": "text",
+                "nullable": true
+              },
+              "name": {
+                "codecId": "pg/text@1",
+                "nativeType": "text",
+                "nullable": false
+              },
+              "updatedAt": {
+                "codecId": "pg/timestamptz@1",
+                "nativeType": "timestamptz",
+                "nullable": false
+              }
+            },
+            "foreignKeys": [],
+            "indexes": [],
+            "primaryKey": {
+              "columns": [
+                "id"
+              ]
+            },
+            "uniques": []
+          },
+          "visitorEvent": {
+            "columns": {
+              "count": {
+                "codecId": "pg/int4@1",
+                "default": {
+                  "kind": "literal",
+                  "value": 1
+                },
+                "nativeType": "int4",
+                "nullable": false
+              },
+              "createdAt": {
+                "codecId": "pg/timestamptz@1",
+                "default": {
+                  "expression": "now()",
+                  "kind": "function"
+                },
+                "nativeType": "timestamptz",
+                "nullable": false
+              },
+              "deviceId": {
+                "codecId": "pg/text@1",
+                "nativeType": "text",
+                "nullable": false
+              },
+              "direction": {
+                "codecId": "pg/text@1",
+                "nativeType": "text",
+                "nullable": false
+              },
+              "id": {
+                "codecId": "sql/char@1",
+                "nativeType": "character",
+                "nullable": false,
+                "typeParams": {
+                  "length": 36
+                }
+              },
+              "occurredAt": {
+                "codecId": "pg/timestamptz@1",
+                "default": {
+                  "expression": "now()",
+                  "kind": "function"
+                },
+                "nativeType": "timestamptz",
+                "nullable": false
+              }
+            },
+            "foreignKeys": [
+              {
+                "constraint": true,
+                "index": true,
+                "source": {
+                  "columns": [
+                    "deviceId"
+                  ],
+                  "namespaceId": "__unbound__",
+                  "tableName": "visitorEvent"
+                },
+                "target": {
+                  "columns": [
+                    "id"
+                  ],
+                  "namespaceId": "__unbound__",
+                  "tableName": "clickerDevice"
+                }
+              }
+            ],
+            "indexes": [],
+            "primaryKey": {
+              "columns": [
+                "id"
+              ]
+            },
+            "uniques": []
+          }
+        }
+      }
+    },
+    "storageHash": "sha256:1fc3d7b399a31953ca13f5fa8590e5dee01f7b7645c61ad03dbcd98942092292"
+  },
+  "execution": {
+    "executionHash": "sha256:0e9f54d1996ac6994a949c12bdbef63249d19b200b4038222027d18950809955",
+    "mutations": {
+      "defaults": [
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "table": "clickerDevice"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "table": "clickerDevice"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "table": "visitorEvent"
+          }
+        }
+      ]
+    }
+  },
+  "capabilities": {
+    "postgres": {
+      "jsonAgg": true,
+      "lateral": true,
+      "limit": true,
+      "orderBy": true,
+      "returning": true
+    },
+    "sql": {
+      "defaultInInsert": true,
+      "enums": true,
+      "returning": true
+    }
+  },
+  "extensionPacks": {},
+  "meta": {},
+  "_generated": {
+    "warning": "⚠️  GENERATED FILE - DO NOT EDIT",
+    "message": "This file is automatically generated by \"prisma-next contract emit\".",
+    "regenerate": "To regenerate, run: prisma-next contract emit"
+  }
+}
