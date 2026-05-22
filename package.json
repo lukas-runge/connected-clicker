@@ -14,7 +14,8 @@
     "db:init": "prisma-next db init",
     "db:update": "prisma-next db update",
     "db:verify": "prisma-next db verify",
-    "migration:status": "prisma-next migration status"
+    "migration:status": "prisma-next migration status",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^7.0.1",
@@ -25,7 +26,8 @@
     "svelte": "^5.55.2",
     "svelte-check": "^4.4.6",
     "typescript": "^6.0.2",
-    "vite": "^8.0.7"
+    "vite": "^8.0.7",
+    "vitest": "^4.1.7"
   },
   "dependencies": {
     "@prisma-next/postgres": "^0.11.0",
