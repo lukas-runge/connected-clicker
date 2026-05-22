@@ -1,5 +1,5 @@
 allowBuilds:
-  esbuild: set this to true or false
+  esbuild: true
 minimumReleaseAgeExclude:
   - '@prisma-next/adapter-postgres@0.11.0'
   - '@prisma-next/cli-telemetry@0.11.0'
