@@ -1,6 +1,9 @@
+import { setTimeout as delay } from 'node:timers/promises';
 import { command, query } from '$app/server';
 import { connectDb, db } from '../prisma/db';
 import { applyVisitorDelta, createVisitorStats } from '$lib/visitor-count';
+
+const LIVE_VISITOR_STATS_INTERVAL_MS = 500;
 
 async function getOrCreateDefaultDevice() {
   const existing = await db.orm.ClickerDevice.orderBy((device) => device.createdAt.asc()).first();
@@ -26,8 +29,11 @@ async function readVisitorStats() {
   return createVisitorStats(result.totalDelta, result.totalEvents);
 }
 
-export const getVisitorStats = query(async () => {
-  return readVisitorStats();
+export const getVisitorStats = query.live(async function* () {
+  while (true) {
+    yield await readVisitorStats();
+    await delay(LIVE_VISITOR_STATS_INTERVAL_MS);
+  }
 });
 
 export const recordVisitorChange = command('unchecked', async (delta: number) => {

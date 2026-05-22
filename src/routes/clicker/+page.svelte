@@ -1,7 +1,30 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import type { VisitorStats } from '$lib/visitor-count';
   import { getVisitorStats, recordVisitorChange } from '../../visitor.remote';
 
   const stats = getVisitorStats();
+  const liveStatsQuery = stats as unknown as {
+    run: () => AsyncGenerator<VisitorStats> | Promise<AsyncGenerator<VisitorStats>>;
+  };
+  let liveStats = $state<VisitorStats>();
+  const displayedStats = $derived(liveStats ?? stats.current);
+
+  onMount(() => {
+    let iterator: AsyncGenerator<VisitorStats> | undefined;
+
+    void (async () => {
+      iterator = await liveStatsQuery.run();
+
+      for await (const value of iterator) {
+        liveStats = value;
+      }
+    })();
+
+    return () => {
+      void iterator?.return(undefined);
+    };
+  });
 
   async function click(delta: 1 | -1) {
     await recordVisitorChange(delta).updates(stats);
@@ -19,44 +42,42 @@
     <p class="eyebrow">Entrance / Exit clicker</p>
     <h1>Tap visitors in and out</h1>
 
-    <svelte:boundary>
-      {#snippet pending()}
-        <div class="loading">Loading current visitor count…</div>
-      {/snippet}
-
+    {#if displayedStats}
       <div class="display">
         <span class="label">On site now</span>
-        <strong>{(await stats).totalVisitors}</strong>
+        <strong>{displayedStats.totalVisitors}</strong>
       </div>
+    {:else}
+      <div class="loading">Loading current visitor count…</div>
+    {/if}
 
-      <div class="buttons" aria-label="Visitor counter controls">
-        <button
-          class="minus"
-          type="button"
-          aria-label="Decrease visitor count"
-          disabled={recordVisitorChange.pending > 0 || (stats.current?.totalVisitors ?? 0) === 0}
-          onclick={() => click(-1)}
-        >
-          <span>−</span>
-          <small>Exit</small>
-        </button>
+    <div class="buttons" aria-label="Visitor counter controls">
+      <button
+        class="minus"
+        type="button"
+        aria-label="Decrease visitor count"
+        disabled={recordVisitorChange.pending > 0 || (displayedStats?.totalVisitors ?? 0) === 0}
+        onclick={() => click(-1)}
+      >
+        <span>−</span>
+        <small>Exit</small>
+      </button>
 
-        <button
-          class="plus"
-          type="button"
-          aria-label="Increase visitor count"
-          disabled={recordVisitorChange.pending > 0}
-          onclick={() => click(1)}
-        >
-          <span>+</span>
-          <small>Entry</small>
-        </button>
-      </div>
+      <button
+        class="plus"
+        type="button"
+        aria-label="Increase visitor count"
+        disabled={recordVisitorChange.pending > 0}
+        onclick={() => click(1)}
+      >
+        <span>+</span>
+        <small>Entry</small>
+      </button>
+    </div>
 
-      <p class="hint">
-        {recordVisitorChange.pending > 0 ? 'Saving click…' : 'Each tap is saved as a visitor event.'}
-      </p>
-    </svelte:boundary>
+    <p class="hint">
+      {recordVisitorChange.pending > 0 ? 'Saving click…' : 'Each tap is saved as a visitor event.'}
+    </p>
   </section>
 </main>
 
