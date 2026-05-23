@@ -53,12 +53,8 @@
         "events": {
           "cardinality": "1:N",
           "on": {
-            "localFields": [
-              "id"
-            ],
-            "targetFields": [
-              "deviceId"
-            ]
+            "localFields": ["id"],
+            "targetFields": ["deviceId"]
           },
           "to": "VisitorEvent"
         }
@@ -136,12 +132,8 @@
         "device": {
           "cardinality": "N:1",
           "on": {
-            "localFields": [
-              "deviceId"
-            ],
-            "targetFields": [
-              "id"
-            ]
+            "localFields": ["deviceId"],
+            "targetFields": ["id"]
           },
           "to": "ClickerDevice"
         }
@@ -215,9 +207,7 @@
             "foreignKeys": [],
             "indexes": [],
             "primaryKey": {
-              "columns": [
-                "id"
-              ]
+              "columns": ["id"]
             },
             "uniques": []
           },
@@ -274,16 +264,12 @@
                 "constraint": true,
                 "index": true,
                 "source": {
-                  "columns": [
-                    "deviceId"
-                  ],
+                  "columns": ["deviceId"],
                   "namespaceId": "__unbound__",
                   "tableName": "visitorEvent"
                 },
                 "target": {
-                  "columns": [
-                    "id"
-                  ],
+                  "columns": ["id"],
                   "namespaceId": "__unbound__",
                   "tableName": "clickerDevice"
                 }
@@ -291,9 +277,7 @@
             ],
             "indexes": [],
             "primaryKey": {
-              "columns": [
-                "id"
-              ]
+              "columns": ["id"]
             },
             "uniques": []
           }

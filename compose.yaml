@@ -12,7 +12,8 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U connected_clicker -d connected_clicker"]
+      test:
+        ["CMD-SHELL", "pg_isready -U connected_clicker -d connected_clicker"]
       interval: 5s
       timeout: 5s
       retries: 10
