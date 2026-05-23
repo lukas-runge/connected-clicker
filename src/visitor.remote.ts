@@ -1,11 +1,10 @@
-import { setTimeout as delay } from 'node:timers/promises';
 import { command, query } from '$app/server';
 import type { RemoteLiveQueryFunction } from '@sveltejs/kit';
 import { connectDb, db } from '../prisma/db';
 import type { VisitorStats } from '$lib/visitor-count';
 import { applyVisitorDelta, createVisitorStats } from '$lib/visitor-count';
 
-const LIVE_VISITOR_STATS_INTERVAL_MS = 500;
+const dbUpdateListeners = new Set<() => void>();
 
 async function getOrCreateDefaultDevice() {
   const existing = await db.orm.ClickerDevice.orderBy((device) => device.createdAt.asc()).first();
@@ -33,9 +32,11 @@ async function readVisitorStats() {
 
 export const getVisitorStats: RemoteLiveQueryFunction<void, VisitorStats> = query.live(async function* (_arg: void) {
   while (true) {
-    yield await readVisitorStats();
-    await delay(LIVE_VISITOR_STATS_INTERVAL_MS);
-  }
+      yield await readVisitorStats();
+      await new Promise<void>((resolve) => {
+        dbUpdateListeners.add(resolve);
+      });
+    }
 });
 
 export const recordVisitorChange = command('unchecked', async (delta: number) => {
@@ -57,6 +58,9 @@ export const recordVisitorChange = command('unchecked', async (delta: number) =>
     direction: delta > 0 ? 'entry' : 'exit',
     count: delta
   });
+
+  dbUpdateListeners.forEach((resolve) => resolve());
+  dbUpdateListeners.clear();
 
   return readVisitorStats();
 });
