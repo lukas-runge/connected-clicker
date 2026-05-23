@@ -1,6 +1,8 @@
 import { setTimeout as delay } from 'node:timers/promises';
 import { command, query } from '$app/server';
+import type { RemoteLiveQueryFunction } from '@sveltejs/kit';
 import { connectDb, db } from '../prisma/db';
+import type { VisitorStats } from '$lib/visitor-count';
 import { applyVisitorDelta, createVisitorStats } from '$lib/visitor-count';
 
 const LIVE_VISITOR_STATS_INTERVAL_MS = 500;
@@ -29,7 +31,7 @@ async function readVisitorStats() {
   return createVisitorStats(result.totalDelta, result.totalEvents);
 }
 
-export const getVisitorStats = query.live(async function* () {
+export const getVisitorStats: RemoteLiveQueryFunction<void, VisitorStats> = query.live(async function* (_arg: void) {
   while (true) {
     yield await readVisitorStats();
     await delay(LIVE_VISITOR_STATS_INTERVAL_MS);

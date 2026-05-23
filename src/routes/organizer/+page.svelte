@@ -1,33 +1,10 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import type { RemoteLiveQuery } from '@sveltejs/kit';
   import type { VisitorStats } from '$lib/visitor-count';
   import { getVisitorStats } from '../../visitor.remote';
 
-  const stats = getVisitorStats();
-  const liveStatsQuery = stats as unknown as {
-    connected: boolean;
-    loading: boolean;
-    reconnect: () => Promise<void>;
-    run: () => AsyncGenerator<VisitorStats> | Promise<AsyncGenerator<VisitorStats>>;
-  };
-  let liveStats = $state<VisitorStats>();
-  const displayedStats = $derived(liveStats ?? stats.current);
-
-  onMount(() => {
-    let iterator: AsyncGenerator<VisitorStats> | undefined;
-
-    void (async () => {
-      iterator = await liveStatsQuery.run();
-
-      for await (const value of iterator) {
-        liveStats = value;
-      }
-    })();
-
-    return () => {
-      void iterator?.return(undefined);
-    };
-  });
+  const stats: RemoteLiveQuery<VisitorStats> = $derived(getVisitorStats());
+  const displayedStats = $derived(await stats);
 </script>
 
 <svelte:head>
@@ -44,14 +21,14 @@
     {#if displayedStats}
       <div class="count">{displayedStats.totalVisitors}</div>
       <p class="caption">
-        Based on {displayedStats.totalEvents} clicker events · {liveStatsQuery.connected ? 'Live' : 'Reconnecting…'}
+        Based on {displayedStats.totalEvents} clicker events · {stats.connected ? 'Live' : 'Reconnecting…'}
       </p>
     {:else}
       <div class="loading">Loading live count…</div>
     {/if}
 
-    <button type="button" onclick={() => liveStatsQuery.reconnect()} disabled={liveStatsQuery.loading}>
-      {liveStatsQuery.loading ? 'Reconnecting…' : 'Reconnect live count'}
+    <button type="button" onclick={() => stats.reconnect()} disabled={stats.loading}>
+      {stats.loading ? 'Reconnecting…' : 'Reconnect live count'}
     </button>
   </section>
 </main>

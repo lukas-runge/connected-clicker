@@ -1,30 +1,10 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import type { RemoteLiveQuery } from '@sveltejs/kit';
   import type { VisitorStats } from '$lib/visitor-count';
   import { getVisitorStats, recordVisitorChange } from '../../visitor.remote';
 
-  const stats = getVisitorStats();
-  const liveStatsQuery = stats as unknown as {
-    run: () => AsyncGenerator<VisitorStats> | Promise<AsyncGenerator<VisitorStats>>;
-  };
-  let liveStats = $state<VisitorStats>();
-  const displayedStats = $derived(liveStats ?? stats.current);
-
-  onMount(() => {
-    let iterator: AsyncGenerator<VisitorStats> | undefined;
-
-    void (async () => {
-      iterator = await liveStatsQuery.run();
-
-      for await (const value of iterator) {
-        liveStats = value;
-      }
-    })();
-
-    return () => {
-      void iterator?.return(undefined);
-    };
-  });
+  const stats: RemoteLiveQuery<VisitorStats> = $derived(getVisitorStats());
+  const displayedStats = $derived(await stats);
 
   async function click(delta: 1 | -1) {
     await recordVisitorChange(delta).updates(stats);
